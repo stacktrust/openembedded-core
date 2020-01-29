@@ -478,6 +478,7 @@ def OEOuthashBasic(path, sigfile, task, d):
     prev_dir = os.getcwd()
     include_owners = os.environ.get('PSEUDO_DISABLED') == '0'
     extra_content = d.getVar('HASHEQUIV_HASH_VERSION')
+    include_timestamps = d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1'
 
     try:
         os.chdir(path)
@@ -550,6 +551,9 @@ def OEOuthashBasic(path, sigfile, task, d):
                     except KeyError:
                         bb.warn("KeyError in %s" % path)
                         raise
+
+                if include_timestamps:
+                    update_hash(" %10d" % s.st_mtime)
 
                 update_hash(" ")
                 if stat.S_ISBLK(s.st_mode) or stat.S_ISCHR(s.st_mode):
