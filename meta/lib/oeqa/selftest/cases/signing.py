@@ -191,6 +191,7 @@ class LockedSignatures(OESelftestTestCase):
 
         feature = 'require %s\n' % locked_sigs_file
         feature += 'SIGGEN_LOCKEDSIGS_TASKSIG_CHECK = "warn"\n'
+        feature += 'TEMPDEBUG = "1"\n'
         self.write_config(feature)
 
         # Build a locked recipe
@@ -227,6 +228,8 @@ class LockedSignatures(OESelftestTestCase):
             extradebug = runCmd('cat bitbake-cookerdaemon.log').output
             extradebug += bitbake(test_recipe + " -S none").output
             extradebug += runCmd('ls -la tmp/stamps/*/ed/*').output
+            feature = 'SUMMARY_${PN} = "test locked signature2%s"\n' % uuid.uuid4()
+            write_file(recipe_append_path, feature)
             ret2 = bitbake(test_recipe)
             found_warn2 = re.search(patt, ret2.output)
             extradebug += "\nFound %s\n\n" % str(found_warn2)
